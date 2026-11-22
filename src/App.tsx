@@ -6,7 +6,8 @@ import {
   deleteTask,
   filterTasks,
   getTaskStats,
-  isTitleValid,
+  getTitleError,
+  MAX_TITLE_LENGTH,
   type Task,
   type Priority,
   type FilterType,
@@ -55,12 +56,9 @@ function App() {
 
   const handleAdd = (e: FormEvent) => {
     e.preventDefault();
-    if (!isTitleValid(title)) {
-      setError(
-        title.trim().length === 0
-          ? 'Title cannot be empty.'
-          : 'Title must be 100 characters or fewer.'
-      );
+    const titleError = getTitleError(title);
+    if (titleError) {
+      setError(titleError);
       return;
     }
     setError(null);
@@ -114,7 +112,7 @@ function App() {
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="e.g. Finish quarterly review"
-                maxLength={100}
+                maxLength={MAX_TITLE_LENGTH}
                 className="w-full rounded-lg border border-slate-300 px-3.5 py-2.5 text-sm outline-none transition focus:border-slate-900 focus:ring-2 focus:ring-slate-900/10"
               />
             </div>

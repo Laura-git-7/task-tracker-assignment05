@@ -6,6 +6,8 @@ import {
   filterTasks,
   getTaskStats,
   isTitleValid,
+  getTitleError,
+  MAX_TITLE_LENGTH,
   type Task,
 } from './tasks';
 
@@ -38,6 +40,27 @@ describe('isTitleValid', () => {
 
   it('accepts a title of exactly 100 characters', () => {
     expect(isTitleValid('a'.repeat(100))).toBe(true);
+  });
+});
+
+describe('getTitleError', () => {
+  it('returns null for a valid title', () => {
+    expect(getTitleError('Buy groceries')).toBeNull();
+  });
+
+  it('returns the empty message for an empty or whitespace-only title', () => {
+    expect(getTitleError('')).toBe('Title cannot be empty.');
+    expect(getTitleError('   ')).toBe('Title cannot be empty.');
+  });
+
+  it('returns the length message for a title over 100 characters', () => {
+    expect(getTitleError('a'.repeat(MAX_TITLE_LENGTH + 1))).toBe(
+      'Title must be 100 characters or fewer.'
+    );
+  });
+
+  it('returns null for a title of exactly 100 characters', () => {
+    expect(getTitleError('a'.repeat(MAX_TITLE_LENGTH))).toBeNull();
   });
 });
 
