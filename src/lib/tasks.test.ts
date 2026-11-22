@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import {
   createTask,
   toggleTask,
@@ -80,6 +80,39 @@ describe('createTask', () => {
 
   it('throws on a title longer than 100 characters', () => {
     expect(() => createTask('a'.repeat(101), 'medium')).toThrow();
+  });
+
+  it('generates a fallback id when crypto.randomUUID is missing', () => {
+    const original = globalThis.crypto;
+    // @ts-expect-error - intentionally deleting crypto to simulate non-secure context
+    delete globalThis.crypto;
+    try {
+      const task = createTask('Fallback id test', 'low');
+      expect(task.id).toBeTruthy();
+      expect(typeof task.id).toBe('string');
+      expect(task.id.length).toBeGreaterThan(0);
+    } finally {
+      globalThis.crypto = original;
+    }
+  });
+
+  it('generates a fallback id when crypto.randomUUID throws', () => {
+    const original = globalThis.crypto;
+    const fakeCrypto = {
+      ...original,
+      randomUUID: vi.fn(() => {
+        throw new Error('not in secure context');
+      }),
+    };
+    globalThis.crypto = fakeCrypto as Crypto;
+    try {
+      const task = createTask('Fallback id throw test', 'low');
+      expect(task.id).toBeTruthy();
+      expect(typeof task.id).toBe('string');
+      expect(task.id).not.toBe('');
+    } finally {
+      globalThis.crypto = original;
+    }
   });
 });
 

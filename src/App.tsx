@@ -64,10 +64,14 @@ function App() {
       return;
     }
     setError(null);
-    const newTask = createTask(title, priority, tag);
-    setTasks((prev) => [newTask, ...prev]);
-    setTitle('');
-    setTag('');
+    try {
+      const newTask = createTask(title, priority, tag);
+      setTasks((prev) => [newTask, ...prev]);
+      setTitle('');
+      setTag('');
+    } catch {
+      setError('Could not create task. Please try again.');
+    }
   };
 
   const handleToggle = (id: string) => {

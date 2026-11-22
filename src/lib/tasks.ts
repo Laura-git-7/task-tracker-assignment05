@@ -23,6 +23,17 @@ export function isTitleValid(title: string): boolean {
   return trimmed.length > 0 && trimmed.length <= MAX_TITLE_LENGTH;
 }
 
+function generateId(): string {
+  try {
+    if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+      return crypto.randomUUID();
+    }
+  } catch {
+    // crypto.randomUUID() throws outside a secure context; fall through.
+  }
+  return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+}
+
 export function createTask(
   title: string,
   priority: Priority,
@@ -37,7 +48,7 @@ export function createTask(
   }
   const trimmedTag = tag?.trim();
   return {
-    id: crypto.randomUUID(),
+    id: generateId(),
     title: trimmedTitle,
     priority,
     completed: false,
